@@ -116,7 +116,6 @@ module Slather
       raise StandardError, "No coverage directory found. Are you sure your project is setup for generating coverage files? Try `slather setup your/project.xcodeproj`" unless dir != nil
       dir
     end
-    private :profdata_coverage_dir
 
     def binary_file
       xctest_bundle = Dir["#{profdata_coverage_dir}/**/*.xctest"].first

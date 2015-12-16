@@ -117,6 +117,26 @@ module Slather
       dir
     end
 
+    def project_name
+      if self.xcodeproj
+        # Remove .xcodeproj file extension
+        project_name_input = self.xcodeproj.gsub(".xcodeproj", "")
+
+        # Filter out Path to file
+        project_name_final = project_name_input
+        while project_name_final.partition('/').last != "" do
+          project_name_final = project_name_final.partition('/').last
+        end
+
+        "#{project_name_final}"
+      else
+        # return wildcard in case of nil xcodeproj
+        project_name = "*"
+
+        "#{project_name}"
+      end
+    end
+
     def binary_file
       xctest_bundle = Dir["#{profdata_coverage_dir}/**/*.xctest"].reject { |bundle|
         bundle.include? "-Runner.app/PlugIns/"
@@ -125,8 +145,14 @@ module Slather
 
       # Find the matching binary file
       xctest_bundle_file_directory = Pathname.new(xctest_bundle).dirname
-      app_bundle = Dir["#{xctest_bundle_file_directory}/*.app"].first
-      dynamic_lib_bundle = Dir["#{xctest_bundle_file_directory}/*.framework"].first
+
+      if self.xcodeproj
+        app_bundle = Dir["#{xctest_bundle_file_directory}/#{project_name}.app"].first
+        dynamic_lib_bundle = Dir["#{xctest_bundle_file_directory}/#{project_name}.framework"].first
+      else
+        app_bundle = Dir["#{xctest_bundle_file_directory}/*.app"].first
+        dynamic_lib_bundle = Dir["#{xctest_bundle_file_directory}/*.framework"].first
+      end
 
       if app_bundle != nil
         binary_file_for_app(app_bundle)

@@ -45,6 +45,10 @@ module Slather
       @all_lines
     end
 
+    def cleaned_gcov_data
+      source_data
+    end
+
     def raw_data
       self.source
     end
@@ -96,9 +100,31 @@ module Slather
       File.basename(source_file_pathname, '.swift')
     end
 
+    def line_number_separator
+      "|"
+    end
+
     def supported_file_extensions
       ["swift"]
     end
     private :supported_file_extensions
+
+    def ignored?
+      ignore = false
+      platform_ignore_list.map do |ignore_suffix|
+        ignore = source_file_pathname.to_s.end_with? ignore_suffix
+        if ignore
+          break
+        end
+      end
+      ignore ? ignore : super
+    end
+
+    def platform_ignore_list
+      ["MacOSX.platform/Developer/Library/Frameworks/XCTest.framework/Headers/XCTestAssertionsImpl.h",
+        "MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/usr/include/objc/objc.h",
+        "MacOSX.platform/Developer/Library/Frameworks/XCTest.framework/Headers/XCTestAssertions.h"]
+    end
+    private :platform_ignore_list
   end
 end

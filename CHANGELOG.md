@@ -2,6 +2,20 @@
 
 ## master
 
+## v1.8.2
+* Add buildkite support to coveralls   
+  [David Hardiman](https://github.com/dhardiman)
+  [#98](https://github.com/venmo/slather/pull/98)
+* Update to xcodeproj 0.28.0 to avoid collisions with Cocoapods 0.39.0   
+  [Julian Krumow](https://github.com/tarbrain)   
+  [#106](https://github.com/venmo/slather/pull/106)/[#109](https://github.com/venmo/slather/pull/109)
+
+## v1.8.1
+* Fixed dependency conflict with CocoaPods v0.38
+* Updated usage of cocoapods plugin API since it has changed in v0.38   
+  [Julian Krumow](https://github.com/tarbrain)
+  [#95](https://github.com/venmo/slather/pull/95)
+
 ## v1.7.0
 * Objective-C++ support  
   [ben-ng](https://github.com/ben-ng)

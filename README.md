@@ -14,7 +14,6 @@ Generate test coverage reports for Xcode projects & hook it into CI.
 | ------- |:--------:|
 | [Parsimmon](https://github.com/ayanonagon/Parsimmon) | [![Parsimmon Coverage](https://coveralls.io/repos/ayanonagon/Parsimmon/badge.svg?branch=master)](https://coveralls.io/r/ayanonagon/Parsimmon?branch=master) |
 | [VENCore](https://github.com/venmo/VENCore) | [![VENCore Coverage](https://coveralls.io/repos/venmo/VENCore/badge.svg?branch=master)](https://coveralls.io/r/venmo/VENCore?branch=master) |
-| [CGFloatType](https://github.com/kylef/CGFloatType) | [![CGFloatType Coverage](https://coveralls.io/repos/kylef/CGFloatType/badge.svg?branch=master)](https://coveralls.io/r/kylef/CGFloatType?branch=master) |
 | [DAZABTest](https://github.com/dasmer/DAZABTest) | [![DAZABTest Coverage](https://coveralls.io/repos/dasmer/DAZABTest/badge.svg?branch=master)](https://coveralls.io/r/dasmer/DAZABTest?branch=master) |
 | [TBStateMachine](https://github.com/tarbrain/TBStateMachine) | [![TBStateMachine Coverage](https://coveralls.io/repos/tarbrain/TBStateMachine/badge.svg?branch=master)](https://coveralls.io/r/tarbrain/TBStateMachine?branch=master) |
 
@@ -48,6 +47,47 @@ To verify you're ready to generate test coverage, run your test suite on your pr
 ```sh
 $ slather coverage -s path/to/project.xcodeproj
 ```
+
+### Usage with Codecov
+
+Login to [Codecov](https://codecov.io/) (no need to activate a repository, this happens automatically). Right now, `slather` supports Codecov via **all** supported CI providers [listed here](https://github.com/codecov/codecov-bash#ci-providers).
+
+Make a `.slather.yml` file:
+
+```yml
+# .slather.yml
+
+coverage_service: cobertura_xml
+xcodeproj: path/to/project.xcodeproj
+source_directory: path/to/sources/to/include
+output_directory: path/to/xml_report
+ignore:
+  - ExamplePodCode/*
+  - ProjectTestsGroup/*
+```
+
+And then in your `.travis.yml`, `circle.yml` (or after test commands in other CI providers), call `slather` after a successful build:
+
+```yml
+# .travis.yml
+
+before_install: rvm use $RVM_RUBY_VERSION
+install: bundle install --without=documentation --path ../travis_bundle_dir
+after_success: 
+  - slather
+  - bash <(curl -s https://codecov.io/bash) -f path/to/xml_report/cobertura.xml
+```
+
+```yml
+# circle.yml
+
+test:
+  post:
+    - bundle exec slather
+    - bash <(curl -s https://codecov.io/bash)
+```
+
+> Private repo? Add `-t :uuid-repo-token` to the codecov uploader. Read more about uploading report to Codecov [here](https://github.com/codecov/codecov-bash)
 
 ### Usage with Coveralls
 
@@ -113,11 +153,21 @@ ignore:
   - ProjectTestsGroup/*
 ```
 
-Or use the command line options `--cobertura-xml` or `-x` and `--output_directory`:
+Or use the command line options `--cobertura-xml` or `-x` and `--output-directory`:
 
 ```sh
 $ slather coverage -x --output-directory path/to/xml_report
 ```
+
+### Static HTML
+
+To create a report as static html pages, use the command line options `--html`:
+
+```sh
+$ slather coverage --html path/to/project.xcodeproj
+```
+
+This will make a directory named `html` in your root directory (unless `--output-directory` is specified) and will generate all the reports as static html pages inside the directory. It will print out the report's path by default, but you can also specify `--show` flag to open it in your browser automatically.
 
 ### Coverage for code included via CocoaPods
 
@@ -152,3 +202,5 @@ Please make sure to follow our general coding style and add test coverage for ne
 * [@tpoulos](https://github.com/tpoulos), the perfect logo.
 * [@ayanonagon](https://github.com/ayanonagon) and [@kylef](https://github.com/kylef), feedback and testing.
 * [@jhersh](https://github.com/jhersh), CircleCI support.
+* [@tarbrain](https://github.com/tarbrain), Cobertura support and bugfixing.
+* [@ikhsan](https://github.com/ikhsan), html support.

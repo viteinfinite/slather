@@ -121,11 +121,9 @@ module Slather
     end
 
     def platform_ignore_list
-      [
-        "MacOSX.platform/Developer/Library/Frameworks/XCTest.framework/Headers/XCTestAssertionsImpl.h",
+      ["MacOSX.platform/Developer/Library/Frameworks/XCTest.framework/Headers/XCTestAssertionsImpl.h",
         "MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/usr/include/objc/objc.h",
-        "MacOSX.platform/Developer/Library/Frameworks/XCTest.framework/Headers/XCTestAssertions.h"
-      ]
+        "MacOSX.platform/Developer/Library/Frameworks/XCTest.framework/Headers/XCTestAssertions.h"]
     end
     private :platform_ignore_list
   end

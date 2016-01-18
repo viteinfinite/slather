@@ -113,6 +113,20 @@ module Slather
       dir
     end
 
+    def profdata_file
+      profdata_coverage_dir = self.profdata_coverage_dir
+      if profdata_coverage_dir == nil
+        raise StandardError, "No coverage directory found. Please make sure the \"Code Coverage\" checkbox is enabled in your scheme's Test action or the build_directory property is set."
+      end
+
+      file =  Dir["#{profdata_coverage_dir}/**/Coverage.profdata"].first
+      unless file != nil
+        return nil
+      end
+      return File.expand_path(file)
+    end
+    private :profdata_file
+
     def find_binary_file_for_app(app_bundle_file)
       app_bundle_file_name_noext = Pathname.new(app_bundle_file).basename.to_s.gsub(".app", "")
       Dir["#{app_bundle_file}/**/#{app_bundle_file_name_noext}"].first
@@ -129,19 +143,13 @@ module Slather
     end
 
     def unsafe_profdata_llvm_cov_output
-      profdata_coverage_dir = self.profdata_coverage_dir
-
-      if profdata_coverage_dir == nil || (profdata_file_arg = Dir["#{profdata_coverage_dir}/**/Coverage.profdata"].first) == nil
+      profdata_file_arg = profdata_file
+      if profdata_file_arg == nil
         raise StandardError, "No Coverage.profdata files found. Please make sure the \"Code Coverage\" checkbox is enabled in your scheme's Test action or the build_directory property is set."
       end
 
       if self.binary_file == nil
         raise StandardError, "No binary file found."
-      end
-
-      if self.verbose_mode
-        puts "\nProcessing coverage file: #{profdata_file_arg}"
-        puts "Against binary file: #{self.binary_file}\n\n"
       end
 
       llvm_cov_args = %W(show -instr-profile #{profdata_file_arg} #{self.binary_file})
@@ -178,6 +186,11 @@ module Slather
       configure_input_format
       configure_scheme
       configure_binary_file
+
+      if self.verbose_mode
+        puts "\nProcessing coverage file: #{profdata_file}"
+        puts "Against binary file: #{self.binary_file}\n\n"
+      end
     end
 
     def configure_build_directory
@@ -254,7 +267,7 @@ module Slather
 
     def configure_binary_file
       if self.input_format == "profdata"
-        self.binary_file ||= self.class.yml["binary_file"] || find_binary_file
+        self.binary_file ||= self.class.yml["binary_file"] || File.expand_path(find_binary_file)
       end
     end
 

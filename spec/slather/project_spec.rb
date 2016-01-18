@@ -430,7 +430,7 @@ describe Slather::Project do
       proj
     end
 
-    it "should print out the coverage for each file, and then total coverage" do
+    it "should print out environment info when in verbose_mode" do
 
       project_root = Pathname("./").realpath
 

@@ -51,7 +51,7 @@ module Slather
   class Project < Xcodeproj::Project
 
     attr_accessor :build_directory, :ignore_list, :ci_service, :coverage_service, :coverage_access_token, :source_directory, 
-      :output_directory, :xcodeproj, :show_html, :input_format, :scheme, :binary_file
+      :output_directory, :xcodeproj, :show_html, :verbose_mode, :input_format, :scheme, :binary_file
 
     alias_method :setup_for_coverage, :slather_setup_for_coverage
 
@@ -139,9 +139,10 @@ module Slather
         raise StandardError, "No binary file found."
       end
 
-      puts "\nProcessing coverage file: #{profdata_file_arg}"
-      puts "Against binary file: #{self.binary_file}\n\n"
-
+      if self.verbose_mode
+        puts "\nProcessing coverage file: #{profdata_file_arg}"
+        puts "Against binary file: #{self.binary_file}\n\n"
+      end
 
       llvm_cov_args = %W(show -instr-profile #{profdata_file_arg} #{self.binary_file})
       `xcrun llvm-cov #{llvm_cov_args.shelljoin}`
